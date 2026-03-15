@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoyMod — Investment AI OS Dashboard</title>
+<style>
+:root {
+  --dark:#060810; --dark2:#0d1117; --dark3:#111827; --bdr:#1f2937;
+  --acc:#00e5a0; --acc2:#00c8e0; --warn:#f59e0b; --danger:#ef4444;
+  --muted:#6b7280; --up:#10b981; --down:#ef4444;
+  --text:#e2e8f0; --text2:#9ca3af;
+  --font: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+  --mono: 'Courier New', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#060810; color:#e2e8f0; font-family:var(--font); min-height:100vh; }
+body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse at 10% 20%,rgba(0,229,160,0.04) 0%,transparent 50%),radial-gradient(ellipse at 90% 80%,rgba(0,200,224,0.04) 0%,transparent 50%); pointer-events:none; z-index:0; }
+
+header { position:sticky; top:0; z-index:100; background:rgba(6,8,16,0.92); backdrop-filter:blur(12px); border-bottom:1px solid #1f2937; padding:12px 24px; display:flex; align-items:center; justify-content:space-between; }
+.logo { font-family:var(--mono); font-size:13px; color:#00e5a0; letter-spacing:2px; }
+.logo span { color:#4b5563; }
+.live { display:flex; align-items:center; gap:6px; font-family:var(--mono); font-size:11px; color:#00e5a0; }
+.dot { width:6px; height:6px; border-radius:50%; background:#00e5a0; animation:blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+.ts { font-family:var(--mono); font-size:11px; color:#4b5563; }
+
+.container { max-width:1400px; margin:0 auto; padding:20px 24px; position:relative; z-index:1; }
+
+.tabs { display:flex; gap:2px; border-bottom:1px solid #1f2937; margin-bottom:16px; }
+.tab { font-family:var(--mono); font-size:11px; letter-spacing:1px; padding:9px 16px; cursor:pointer; color:#6b7280; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.2s; text-transform:uppercase; }
+.tab:hover { color:#e2e8f0; }
+.tab.on { color:#00e5a0; border-bottom-color:#00e5a0; }
+.tpanel { display:none; }
+.tpanel.on { display:block; }
+
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+.grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+
+.card { background:#0d1117; border:0.5px solid #1f2937; border-radius:8px; padding:14px; }
+.clabel { font-family:var(--mono); font-size:10px; color:#6b7280; letter-spacing:1px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+.badge { font-size:10px; padding:2px 7px; border-radius:4px; font-family:var(--mono); }
+.b-up { background:rgba(16,185,129,0.15); color:#10b981; }
+.b-warn { background:rgba(245,158,11,0.15); color:#f59e0b; }
+
+.mrow { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:0.5px solid rgba(31,41,55,0.5); font-size:12px; }
+.mrow:last-child { border-bottom:none; }
+.mname { color:#9ca3af; }
+.mval { font-family:var(--mono); font-size:12px; font-weight:700; }
+.up { color:#10b981; } .down { color:#ef4444; } .neu { color:#f59e0b; }
+
+.gauge { margin:6px 0; }
+.glabel { display:flex; justify-content:space-between; font-size:11px; color:#9ca3af; margin-bottom:3px; }
+.gtrack { height:5px; background:#1f2937; border-radius:3px; overflow:hidden; }
+.gfill { height:100%; border-radius:3px; }
+
+.flow { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:0.5px solid rgba(31,41,55,0.4); font-size:12px; }
+.flow:last-child { border-bottom:none; }
+.fi { font-size:13px; width:20px; text-align:center; }
+.fn { flex:1; }
+.fn-name { color:#e2e8f0; font-size:12px; }
+.fn-sub { color:#6b7280; font-size:11px; }
+.fa { font-family:var(--mono); font-size:14px; font-weight:700; }
+
+.regime { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.rbox { border:0.5px solid #1f2937; border-radius:6px; padding:10px; text-align:center; }
+.rbox.active { border:1.5px solid rgba(245,158,11,0.5); background:rgba(245,158,11,0.05); }
+.rico { font-size:16px; }
+.rtag { font-family:var(--mono); font-size:10px; margin-top:4px; }
+.rsub { font-size:10px; color:#6b7280; margin-top:2px; line-height:1.4; }
+
+.minicard { background:#0d1117; border:0.5px solid #1f2937; border-radius:8px; padding:12px; text-align:center; }
+.mclabel { font-family:var(--mono); font-size:10px; color:#6b7280; margin-bottom:6px; }
+.mcval { font-family:var(--mono); font-size:22px; font-weight:700; }
+.mcsub { font-size:11px; color:#6b7280; margin-top:4px; }
+
+.scard { background:#111827; border:0.5px solid #1f2937; border-radius:6px; padding:12px; margin-bottom:8px; }
+.scard.h { border-left:2px solid #10b981; }
+.scard.m { border-left:2px solid #f59e0b; }
+.stags { display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap; }
+.stag { font-family:var(--mono); font-size:10px; padding:2px 6px; border-radius:3px; }
+.t-mac { background:rgba(0,229,160,0.1); color:#00e5a0; }
+.t-pol { background:rgba(0,200,224,0.1); color:#00c8e0; }
+.t-cry { background:rgba(245,158,11,0.1); color:#f59e0b; }
+.t-geo { background:rgba(239,68,68,0.1); color:#ef4444; }
+.t-hi { background:rgba(16,185,129,0.1); color:#10b981; }
+.t-me { background:rgba(245,158,11,0.1); color:#f59e0b; }
+.stitle { font-size:13px; font-weight:600; margin-bottom:4px; color:#e2e8f0; }
+.sdesc { font-size:12px; color:#9ca3af; line-height:1.5; }
+.simp { font-size:11px; margin-top:6px; }
+
+.abox { background:linear-gradient(135deg,rgba(0,229,160,0.05),rgba(0,200,224,0.03)); border:0.5px solid rgba(0,229,160,0.2); border-radius:8px; padding:14px; }
+.arow { display:flex; gap:10px; margin-bottom:10px; }
+.aicon { font-size:14px; min-width:20px; }
+.albl { font-family:var(--mono); font-size:10px; color:#00e5a0; letter-spacing:1px; }
+.atxt { font-size:12px; color:#e2e8f0; margin-top:2px; line-height:1.5; }
+.confbar { display:flex; align-items:center; gap:10px; margin-top:4px; }
+.ctrack { flex:1; height:6px; background:#1f2937; border-radius:3px; overflow:hidden; }
+.cfill { height:100%; background:linear-gradient(90deg,#00e5a0,#00c8e0); border-radius:3px; }
+.cnum { font-family:var(--mono); font-size:13px; font-weight:700; color:#10b981; }
+
+.rulesbox { background:#0d1117; border:0.5px solid #1f2937; border-radius:8px; padding:12px; margin-top:12px; }
+.rulerow { display:flex; gap:8px; align-items:center; font-size:12px; padding:3px 0; }
+
+.inp { width:100%; background:#111827; border:0.5px solid #1f2937; border-radius:6px; padding:10px; color:#e2e8f0; font-family:var(--font); font-size:13px; resize:vertical; min-height:90px; outline:none; line-height:1.5; }
+.inp:focus { border-color:#00e5a0; }
+.btn { background:linear-gradient(135deg,#00e5a0,#00c8e0); border:none; border-radius:6px; padding:9px 20px; font-family:var(--mono); font-size:11px; font-weight:700; color:#060810; cursor:pointer; letter-spacing:1px; margin-top:8px; transition:opacity 0.2s; }
+.btn:hover { opacity:0.85; }
+.btn:disabled { opacity:0.4; cursor:not-allowed; }
+.output { background:#111827; border:0.5px solid #1f2937; border-radius:6px; padding:12px; margin-top:10px; font-size:12px; line-height:1.8; white-space:pre-wrap; color:#e2e8f0; min-height:60px; display:none; }
+.output.show { display:block; }
+.loading { color:#00e5a0; font-family:var(--mono); font-size:11px; }
+.tmpl { background:#111827; border:0.5px solid #1f2937; border-radius:6px; padding:10px 12px; cursor:pointer; margin-bottom:6px; transition:border-color 0.2s; }
+.tmpl:hover { border-color:#00e5a0; }
+.tlbl { font-family:var(--mono); font-size:10px; margin-bottom:3px; }
+.tname { font-size:13px; color:#e2e8f0; }
+
+.sec { font-family:var(--mono); font-size:10px; color:#00e5a0; letter-spacing:2px; margin-bottom:10px; }
+.htag { color:#00c8e0; font-family:var(--mono); font-size:11px; }
+
+footer { border-top:1px solid #1f2937; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#4b5563; font-family:var(--mono); margin-top:24px; }
+
+@media(max-width:900px){
+  .grid2,.grid4 { grid-template-columns:1fr; }
+}
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:#060810; }
+::-webkit-scrollbar-thumb { background:#1f2937; border-radius:2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MoyMod <span>// Investment AI OS</span></div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="live"><div class="dot"></div>LIVE</div>
+    <div class="ts" id="ts">--</div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab on" onclick="sw('macro',this)">MACRO</div>
+    <div class="tab" onclick="sw('crypto',this)">BTC/ETH</div>
+    <div class="tab" onclick="sw('signal',this)">SIGNAL</div>
+    <div class="tab" onclick="sw('ai',this)">AI FILTER</div>
+  </div>
+
+  <!-- MACRO -->
+  <div class="tpanel on" id="tab-macro">
+    <div class="grid2">
+      <div class="card">
+        <div class="clabel">GLOBAL LIQUIDITY <span class="badge b-up">EXPANDING</span></div>
+        <div class="mrow"><span class="mname">Fed Balance Sheet</span><span class="mval neu">$6.73T ▼ QT</span></div>
+        <div class="mrow"><span class="mname">Global M2</span><span class="mval up">↑ +4.2% YoY</span></div>
+        <div class="mrow"><span class="mname">TGA</span><span class="mval neu">$742B ▼ Drain</span></div>
+        <div class="mrow"><span class="mname">RRP</span><span class="mval up">$312B ▼ Bullish</span></div>
+        <div class="mrow"><span class="mname">DXY</span><span class="mval neu">103.24 ▼ Weak</span></div>
+      </div>
+      <div class="card">
+        <div class="clabel">LIQUIDITY TRANSMISSION <span class="badge b-warn">MONITOR</span></div>
+        <div class="flow"><span class="fi">🏦</span><div class="fn"><div class="fn-name">Treasury Issuance</div><div class="fn-sub">T-bill heavy → pressure MMF</div></div><span class="fa up">↑</span></div>
+        <div class="flow"><span class="fi">💵</span><div class="fn"><div class="fn-name">MMF Flow</div><div class="fn-sub">$6.1T AUM — ยังอยู่ใน Cash</div></div><span class="fa neu">→</span></div>
+        <div class="flow"><span class="fi">🪙</span><div class="fn"><div class="fn-name">Stablecoin Supply</div><div class="fn-sub">USDT+USDC: $165B ↑</div></div><span class="fa up">↑</span></div>
+        <div class="flow"><span class="fi">📦</span><div class="fn"><div class="fn-name">BTC ETF Net Flow</div><div class="fn-sub">+$285M (7d avg)</div></div><span class="fa up">↑</span></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="clabel">RISK SENTIMENT <span class="badge b-warn">MIXED</span></div>
+        <div class="gauge"><div class="glabel"><span>VIX</span><span class="neu">22.4</span></div><div class="gtrack"><div class="gfill" style="width:45%;background:linear-gradient(90deg,#10b981,#f59e0b)"></div></div></div>
+        <div class="gauge"><div class="glabel"><span>Gold</span><span class="up">$2,985</span></div><div class="gtrack"><div class="gfill" style="width:82%;background:linear-gradient(90deg,#f59e0b,#10b981)"></div></div></div>
+        <div class="gauge"><div class="glabel"><span>TLT (Bond)</span><span class="down">$91.2</span></div><div class="gtrack"><div class="gfill" style="width:38%;background:linear-gradient(90deg,#ef4444,#f59e0b)"></div></div></div>
+        <div class="gauge"><div class="glabel"><span>HY Credit Spread</span><span class="neu">320 bps</span></div><div class="gtrack"><div class="gfill" style="width:52%;background:linear-gradient(90deg,#10b981,#f59e0b)"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="clabel">MACRO REGIME</div>
+        <div class="regime">
+          <div class="rbox"><div class="rico">🟢</div><div class="rtag up">RISK-ON</div><div class="rsub">Liquidity↑ DXY↓</div></div>
+          <div class="rbox active"><div class="rico">⚡</div><div class="rtag neu">TRANSITION</div><div class="rsub">Mixed ← HERE</div></div>
+          <div class="rbox"><div class="rico">🔵</div><div class="rtag" style="color:#00c8e0">DEFENSIVE</div><div class="rsub">Gold/Bond bid</div></div>
+          <div class="rbox"><div class="rico">🔴</div><div class="rtag down">RISK-OFF</div><div class="rsub">Liquidity↓ DXY↑</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRYPTO -->
+  <div class="tpanel" id="tab-crypto">
+    <div class="grid4">
+      <div class="minicard"><div class="mclabel">BTC DOM</div><div class="mcval up">62.4%</div><div class="mcsub">Alt season NOT yet</div></div>
+      <div class="minicard"><div class="mclabel">ETH/BTC</div><div class="mcval down">0.0238</div><div class="mcsub">ETH still weak</div></div>
+      <div class="minicard"><div class="mclabel">FUNDING</div><div class="mcval neu">+0.01%</div><div class="mcsub">Healthy / Neutral</div></div>
+      <div class="minicard"><div class="mclabel">OPEN INTEREST</div><div class="mcval up">$38.2B</div><div class="mcsub">Growing OI</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="clabel">BTC STRUCTURE</div>
+        <div class="mrow"><span class="mname">Price</span><span class="mval up">$84,200</span></div>
+        <div class="mrow"><span class="mname">4H Structure</span><span class="mval up">Higher Highs ✓</span></div>
+        <div class="mrow"><span class="mname">Key Support</span><span class="mval">$79,500</span></div>
+        <div class="mrow"><span class="mname">Key Resistance</span><span class="mval">$89,000</span></div>
+        <div class="mrow"><span class="mname">ETF 7D Flow</span><span class="mval up">+$1.99B</span></div>
+      </div>
+      <div class="card">
+        <div class="clabel">ETH STRUCTURE</div>
+        <div class="mrow"><span class="mname">Price</span><span class="mval down">$2,006</span></div>
+        <div class="mrow"><span class="mname">4H Structure</span><span class="mval down">Lower Highs ⚠</span></div>
+        <div class="mrow"><span class="mname">Key Support</span><span class="mval">$1,900</span></div>
+        <div class="mrow"><span class="mname">Key Resistance</span><span class="mval">$2,200</span></div>
+        <div class="mrow"><span class="mname">ETH/BTC Trend</span><span class="mval down">Downtrend — wait</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGNAL -->
+  <div class="tpanel" id="tab-signal">
+    <div class="grid2">
+      <div>
+        <div class="sec">ACTIVE SIGNALS</div>
+        <div class="scard h">
+          <div class="stags"><span class="stag t-mac">MACRO</span><span class="stag t-hi">HIGH</span></div>
+          <div class="stitle">RRP ลดต่อเนื่อง → Liquidity เข้าระบบ</div>
+          <div class="sdesc">RRP ลดจาก $500B → $312B ใน 3 เดือน เงินไหลออกจาก Fed กลับสู่ตลาด Bullish Risk Asset</div>
+          <div class="simp up">↑ Liquidity +++ → BTC Bullish</div>
+        </div>
+        <div class="scard m">
+          <div class="stags"><span class="stag t-pol">POLICY</span><span class="stag t-me">MEDIUM</span></div>
+          <div class="stitle">Fed Pause — ยังไม่ Cut</div>
+          <div class="sdesc">Fed คงดอกเบี้ย 5.25-5.5% ตลาดคาด Cut Q3 Dot plot ยังไม่ชัด ความเสี่ยง: Inflation rebound</div>
+          <div class="simp neu">→ Neutral / Watch CPI</div>
+        </div>
+        <div class="scard h">
+          <div class="stags"><span class="stag t-cry">CRYPTO</span><span class="stag t-hi">HIGH</span></div>
+          <div class="stitle">BTC ETF Inflow กลับมา</div>
+          <div class="sdesc">7D Net Inflow +$1.99B สถาบันกลับเข้าซื้อ หลัง Outflow 3 สัปดาห์ก่อนหน้า</div>
+          <div class="simp up">↑ Demand กลับมา → Bullish</div>
+        </div>
+      </div>
+      <div>
+        <div class="sec">PROFIT POINT</div>
+        <div class="abox">
+          <div class="arow"><span class="aicon">📈</span><div><div class="albl">SIGNAL</div><div class="atxt">Accumulate BTC บน Dip — Macro Bullish, ETF Flow กลับมา, RRP ลด</div></div></div>
+          <div class="arow"><span class="aicon">🎯</span><div><div class="albl">ACTION</div><div class="atxt">DCA เข้า BTC ที่ $79,500–$84,000 | รอ ETH/BTC Reversal ก่อน rotate</div></div></div>
+          <div class="arow"><span class="aicon">⚠</span><div><div class="albl">RISK</div><div class="atxt">CPI สูงกว่าคาด / DXY กลับขึ้น >105 / Geopolitical shock</div></div></div>
+          <div class="arow"><span class="aicon">📊</span><div><div class="albl">CONFIDENCE</div><div class="confbar"><div class="ctrack"><div class="cfill" style="width:68%"></div></div><span class="cnum">68%</span></div></div></div>
+          <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid rgba(255,255,255,0.05);font-size:12px;">
+            <span style="color:#6b7280;">Timing: </span><span style="color:#00c8e0;font-family:var(--mono);">2–4 wks | Q2 2025</span>
+          </div>
+        </div>
+        <div class="rulesbox">
+          <div style="font-family:var(--mono);font-size:10px;color:#6b7280;margin-bottom:8px;">RULES CHECK</div>
+          <div class="rulerow"><span class="up">✓</span><span style="font-size:12px;color:#9ca3af;">Capital Flow ก่อน Narrative</span></div>
+          <div class="rulerow"><span class="up">✓</span><span style="font-size:12px;color:#9ca3af;">Liquidity Transmission ผ่านแล้ว</span></div>
+          <div class="rulerow"><span class="up">✓</span><span style="font-size:12px;color:#9ca3af;">ทุก Event ระบุ +/- Liquidity</span></div>
+          <div class="rulerow"><span class="up">✓</span><span style="font-size:12px;color:#9ca3af;">มี Confidence Level</span></div>
+          <div class="rulerow"><span class="up">✓</span><span style="font-size:12px;color:#9ca3af;">ไม่มี Prophecy ไร้หลักฐาน</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI FILTER -->
+  <div class="tpanel" id="tab-ai">
+    <div class="grid2">
+      <div>
+        <div class="sec">AI FILTER — 3 TASKS</div>
+        <textarea class="inp" id="ni" placeholder="วางข่าว / Event ที่ต้องการวิเคราะห์...&#10;เช่น: Fed คงดอกเบี้ย / BTC ETF inflow พุ่ง $500M"></textarea>
+        <button class="btn" id="runBtn" onclick="runAI()">RUN: FILTER → MACRO → PROFIT</button>
+        <div class="output" id="out"></div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:#6b7280;letter-spacing:2px;margin-bottom:10px;">TEMPLATES</div>
+        <div class="tmpl" onclick="setT('fed')"><div class="tlbl" style="color:#00c8e0;">TEMPLATE 1 — FED/POLICY</div><div class="tname">Fed / Central Bank Event</div></div>
+        <div class="tmpl" onclick="setT('btc')"><div class="tlbl" style="color:#f59e0b;">TEMPLATE 2 — BTC/ETF</div><div class="tname">BTC / ETF Flow Event</div></div>
+        <div class="tmpl" onclick="setT('geo')"><div class="tlbl" style="color:#ef4444;">TEMPLATE 3 — GEO</div><div class="tname">Geopolitical / Macro Shock</div></div>
+        <div class="card" style="margin-top:10px;">
+          <div class="clabel">CLASSIFICATION TAGS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;">
+            <span class="stag t-mac">MACRO</span><span class="stag t-geo">GEO</span><span class="stag t-pol">POLICY</span><span class="stag t-cry">CRYPTO</span>
+            <span class="stag" style="background:rgba(107,114,128,0.15);color:#6b7280;">NOISE</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;">
+            <span class="stag t-hi">HIGH</span><span class="stag t-me">MEDIUM</span>
+            <span class="stag" style="background:rgba(107,114,128,0.15);color:#6b7280;">LOW</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div><span class="htag">#NoNoise</span> <span class="htag">#MoyMod</span> — Investment AI OS v1.0</div>
+  <div id="ts2" style="color:#374151;">--</div>
+</footer>
+
+<script>
+const tmpls = {
+  fed:'Fed กล่าวในการประชุม FOMC ว่าจะยังคงอัตราดอกเบี้ยไว้ที่ 5.25-5.5% และส่งสัญญาณว่าอาจมีการลดดอกเบี้ย 2 ครั้งในปีนี้ หากเงินเฟ้อลดลงตามคาด',
+  btc:'BTC Spot ETF รายงาน Net Inflow รวม +$850M ในวันเดียว นำโดย BlackRock IBIT +$620M และ Fidelity FBTC +$180M ราคา BTC ขึ้น 3.2%',
+  geo:'ความตึงเครียดระหว่างสหรัฐฯ และจีนในประเด็นไต้หวันเพิ่มสูงขึ้น สหรัฐฯ ประกาศมาตรการคว่ำบาตรชิปเพิ่มเติม ตลาดหุ้นเอเชียปรับตัวลง'
+};
+function setT(k){ document.getElementById('ni').value=tmpls[k]; }
+function sw(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('tab-'+name).classList.add('on');
+}
+function tick(){
+  const s=new Date().toLocaleString('th-TH',{timeZone:'Asia/Bangkok',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('ts').textContent=s;
+  document.getElementById('ts2').textContent=s;
+}
+tick(); setInterval(tick,1000);
+
+async function runAI(){
+  const news=document.getElementById('ni').value.trim();
+  if(!news) return;
+  const btn=document.getElementById('runBtn');
+  const out=document.getElementById('out');
+  btn.disabled=true; btn.textContent='RUNNING...';
+  out.className='output show';
+  out.innerHTML='<span class="loading">⚡ Task 1: Filtering... → Task 2: Macro Integration... → Task 3: Profit Point...</span>';
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`คุณคือ Investment AI วิเคราะห์ตาม AnalysisRules:
+1.ไม่คาดเดาโดยไม่มีหลักฐาน 2.อ้างอิง Capital Flow ก่อน Narrative 3.ดู Liquidity Transmission ก่อนสรุป 4.ทุก Event ตอบว่าเพิ่ม/ลด Liquidity 5.สรุป Macro→Signal→Action 6.ให้ Confidence Level ทุกครั้ง 7.ห้าม Overfit Prophecy
+ตอบภาษาไทย สั้น กระชับ คม ใช้ Symbol ประกอบ`,
+        messages:[{role:'user',content:`วิเคราะห์ผ่าน 3 Tasks:\n\n📰 ข่าว: ${news}\n\n🧹 TASK 1 — NOISE FILTER\nจัดประเภท (Macro/Geo/Policy/Crypto/Noise) + Impact (High/Med/Low) + เหตุผล\n\n🔗 TASK 2 — MACRO INTEGRATION\n• Liquidity: เพิ่ม/ลด/Neutral?\n• Transmission: กระทบ MMF/Treasury/Stablecoin/ETF?\n• Risk Sentiment: Risk-On/Off/Mixed?\n• Crypto Impact: BTC/ETH?\n\n💸 TASK 3 — PROFIT POINT\n📈 Signal:\n🎯 Action:\n⚠️ Risk:\n📊 Confidence: X%\n⏱ Timing:`}]
+      })
+    });
+    const d=await res.json();
+    out.textContent=d.content?.map(b=>b.text||'').join('')||'Error';
+  } catch(e){
+    out.innerHTML='<span style="color:#ef4444;">Error: '+e.message+'</span>';
+  }
+  btn.disabled=false; btn.textContent='RUN: FILTER → MACRO → PROFIT';
+}
+</script>
+</body>
+</html>
