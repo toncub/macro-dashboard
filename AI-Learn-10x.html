@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 AI Learn 10x - NotebookLM + Gemini + Obsidian (จับมือทำ)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600&display=swap');
+        body { font-family: 'Prompt', system-ui, sans-serif; }
+        .tail-text { font-family: 'Inter', sans-serif; }
+        .step-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .step-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .tab-active { border-bottom: 4px solid #3b82f6; color: #1e40af; font-weight: 600; }
+        .progress-bar { transition: width 0.6s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <div class="max-w-6xl mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center gap-3 bg-white shadow-md px-6 py-3 rounded-3xl">
+                <div class="w-10 h-10 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl">🚀</div>
+                <h1 class="text-4xl font-bold text-slate-900">AI Learn 10x</h1>
+            </div>
+            <p class="mt-4 text-2xl text-slate-700 max-w-2xl mx-auto">
+                NotebookLM + Gemini + Obsidian<br>
+                <span class="text-blue-600 font-semibold">เรียนอะไรก็ได้ เร็วขึ้น 10 เ��่า • ประหยัดเวลาเป็นเดือนใน 15 นาที</span>
+            </p>
+            <div class="mt-6 flex justify-center gap-4 text-sm">
+                <div class="bg-white px-5 py-2 rounded-3xl shadow flex items-center gap-2">
+                    <i class="fa-solid fa-check text-green-500"></i>
+                    <span class="font-medium">จากวิดีโอ Russian Dev (13 นาที)</span>
+                </div>
+                <div onclick="window.scrollTo({top: document.getElementById('start').offsetTop - 100, behavior: 'smooth'})" 
+                     class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-3xl font-semibold cursor-pointer flex items-center gap-2">
+                    <i class="fa-solid fa-play"></i>
+                    เริ่มจับมือทำเลย
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="bg-white rounded-3xl shadow p-6 mb-12">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-lg flex items-center gap-2"><i class="fa-solid fa-flag-checkered"></i> ความคืบหน้าของคุณ</h3>
+                <div id="progress-text" class="font-mono text-blue-600 font-bold">0/3 ขั้นตอน</div>
+            </div>
+            <div class="h-3 bg-slate-100 rounded-3xl overflow-hidden">
+                <div id="progress-bar" class="progress-bar h-full bg-gradient-to-r from-blue-500 to-cyan-500 w-0"></div>
+            </div>
+            <div class="flex justify-between mt-3 text-xs text-slate-500">
+                <div>NotebookLM</div>
+                <div>Gemini</div>
+                <div>Obsidian</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-200 mb-8">
+            <button onclick="switchTab(0)" id="tab-0" 
+                    class="tab tab-active px-8 py-4 text-lg font-medium flex-1 text-center">📚 ขั้นที่ 1: NotebookLM</button>
+            <button onclick="switchTab(1)" id="tab-1" 
+                    class="tab px-8 py-4 text-lg font-medium flex-1 text-center">🧠 ขั้นที่ 2: Gemini</button>
+            <button onclick="switchTab(2)" id="tab-2" 
+                    class="tab px-8 py-4 text-lg font-medium flex-1 text-center">📂 ขั้นที่ 3: Obsidian</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="content-0" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left: Steps -->
+                <div class="lg:col-span-7">
+                    <div class="bg-white rounded-3xl shadow-xl p-8 step-card">
+                        <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                            <span class="bg-blue-100 text-blue-600 w-9 h-9 flex items-center justify-center rounded-2xl text-xl">1</span>
+                            NotebookLM = เครื่องกรองข้อมูลดิบ (Input → Clean Output)
+                        </h2>
+                        
+                        <div class="space-y-8">
+                            <!-- Substep 1 -->
+                            <div class="border-l-4 border-blue-500 pl-6">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="bg-blue-100 text-blue-700 w-7 h-7 rounded-xl flex items-center justify-center font-bold">1.1</div>
+                                    <h4 class="font-semibold text-xl">สร้าง Notebook ใหม่</h4>
+                                </div>
+                                <p class="text-slate-600">ไปที่ <a href="https://notebooklm.google.com" target="_blank" class="text-blue-600 underline">notebooklm.google.com</a> → คลิก “Create new notebook” → ตั้งชื่อ เช่น “Relocation 2026” หรือ “Python Metaclass”</p>
+                            </div>
+
+                            <!-- Substep 2 -->
+                            <div class="border-l-4 border-blue-500 pl-6">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="bg-blue-100 text-blue-700 w-7 h-7 rounded-xl flex items-center justify-center font-bold">1.2</div>
+                                    <h4 class="font-semibold text-xl">โยน Sources เข้าไป (สำคัญที่สุด!)</h4>
+                                </div>
+                                <ul class="list-disc pl-6 space-y-2 text-slate-600">
+                                    <li>กด “Add source” → วางลิงก์ YouTube (แนะนำใช้ Extension “NotebookLM YouTube” เพื่อโยนทั้งช่อง)</li>
+                                    <li>อัพโหลด PDF หนังสือ / คอร์ส / รายงาน</li>
+                                    <li>หรือพิมพ์คีย์เวิร์ด → NotebookLM ค้นหาให้อัตโนมัติ</li>
+                                </ul>
+                                <div class="mt-4 bg-amber-50 border border-amber-200 p-4 rounded-2xl text-sm">
+                                    <strong>Tip จับมือ:</strong> ใส่แหล่งข้อมูล 10–30 ชิ้น (YouTube + เว็บ + PDF) จะยิ่งแม่นยำ
+                                </div>
+                            </div>
+
+                            <!-- Prompt -->
+                            <div class="bg-slate-900 text-white p-6 rounded-3xl">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-medium">📋 Prompt หลักสำหรับ NotebookLM (คัดลอกได้เลย)</span>
+                                    <button onclick="copyPrompt(this)" 
+                                            class="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-2 rounded-2xl text-xs">
+                                        <i class="fa-solid fa-copy"></i> คัดลอก
+                                    </button>
+                                </div>
+                                <pre id="prompt1" class="text-sm overflow-auto max-h-64 font-mono bg-black/50 p-4 rounded-2xl text-cyan-300">ฉันกำลังศึกษาหัวข้อ "[ใส่หัวข้อ เช่น การย้ายไปอยู่บัลแกเรีย]". 
+ฉันมีพื้นฐานระดับ [ใส่ระดับตัวเอง เช่น มีพื้นฐานนิดหน่อย]. 
+ช่วยทำ 4 อย่าง:
+1. สรุปเฉพาะ insight ใหม่ ๆ ที่ฉันยังไม่รู้ (ตัดส่วนซ้ำซากทั้งหมด)
+2. เขียนเป็น Markdown bullet points ชัดเจน
+3. สร้างตารางเปรียบเทียบ (ถ้ามีหลายประเทศ/หลายทางเลือก)
+4. ใส่แหล่งอ้างอิงทุกจุด + Audio Overview + Mind Map</pre>
+                            </div>
+
+                            <!-- Output -->
+                            <div class="text-slate-600">
+                                <strong>ผลลัพธ์ที่ได้:</strong> Audio Overview (ฟังได้เลย), Mind Map, Flashcard, Test, Infographic, Markdown สรุปพร้อมแหล่งอ้างอิง
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Example + Checklist -->
+                <div class="lg:col-span-5">
+                    <div class="bg-white rounded-3xl p-8 h-full flex flex-col">
+                        <h4 class="font-bold text-xl mb-6">ตัวอย่างจริงจากวิดีโอ</h4>
+                        <div class="flex-1 space-y-6">
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex-shrink-0 flex items-center justify-center text-3xl">🇧🇬</div>
+                                <div>
+                                    <p class="font-medium">Relocation: เปรียบเทียบ 8 ประเทศ</p>
+                                    <p class="text-sm text-slate-500">จาก 360 ชม. → 15 นาที<br>ได้ตารางค่าครองชีพ + ภาษี + ข้อเสียจริง</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 bg-rose-100 rounded-2xl flex-shrink-0 flex items-center justify-center text-3xl">📖</div>
+                                <div>
+                                    <p class="font-medium">หนังสือ Rich Dad Poor Dad</p>
+                                    <p class="text-sm text-slate-500">NotebookLM บอกเลยว่า “ข้ามได้ เพราะคุณรู้หมดแล้วตั้งแต่ปี 2018”</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Checklist -->
+                        <div class="mt-auto pt-8 border-t">
+                            <p class="text-xs uppercase tracking-widest text-slate-400 mb-3">เช็คลิสต์ขั้นนี้</p>
+                            <label onclick="updateProgress()" class="flex items-center gap-3 cursor-pointer py-2 group">
+                                <input type="checkbox" class="w-5 h-5 accent-blue-600">
+                                <span class="text-slate-700 group-hover:text-blue-600">สร้าง Notebook + ใส่ Source เรียบร้อย</span>
+                            </label>
+                            <label onclick="updateProgress()" class="flex items-center gap-3 cursor-pointer py-2 group">
+                                <input type="checkbox" class="w-5 h-5 accent-blue-600">
+                                <span class="text-slate-700 group-hover:text-blue-600">รัน Prompt แล้วได้ Markdown + Audio</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2 Content -->
+        <div id="content-1" class="tab-content hidden">
+            <div class="bg-white rounded-3xl shadow-xl p-10">
+                <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                    <span class="bg-violet-100 text-violet-600 w-9 h-9 flex items-center justify-center rounded-2xl text-xl">2</span>
+                    Gemini = นักคิด + เขียน + ตัดสิน (Synthesis & Personalize)
+                </h2>
+                
+                <div class="max-w-2xl mx-auto">
+                    <ol class="space-y-10">
+                        <li class="flex gap-6">
+                            <div class="font-mono text-4xl font-bold text-violet-300">01</div>
+                            <div>
+                                <p class="font-semibold">เปิด Gemini (gemini.google.com) หรือ Gemini Advanced</p>
+                                <p class="text-slate-600 mt-1">กด “Attach” → เลือก NotebookLM ที่เพิ่งทำเสร็จ (เชื่อมกันอัตโนมัติ)</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-6">
+                            <div class="font-mono text-4xl font-bold text-violet-300">02</div>
+                            <div class="flex-1">
+                                <p class="font-semibold mb-3">Paste Prompt นี้ (คัดลอกได้)</p>
+                                <div class="bg-slate-900 text-cyan-300 p-6 rounded-3xl text-sm font-mono">
+                                    <button onclick="copyPrompt(this)" class="float-right text-xs bg-white/10 px-4 py-1 rounded-xl mb-4">คัดลอก</button>
+                                    นี่คือสรุปจาก NotebookLM: [วางทั้งหมด]<br>
+                                    ฉันรู้เรื่องนี้ระดับ [บอกระดับตัวเอง]<br><br>
+                                    ช่วยทำ 3 อย่าง:<br>
+                                    1. ตัดส่วนที่ฉันรู้แล้วออกหมด<br>
+                                    2. เขียนเป็น bullet points พร้อมแหล่งอ้างอิง<br>
+                                    3. สร้าง script / ตาราง / แนะนำส่วนที่ต้องลึกกว่านี้
+                                </div>
+                            </div>
+                        </li>
+                        <li class="flex gap-6">
+                            <div class="font-mono text-4xl font-bold text-violet-300">03</div>
+                            <div>
+                                <p class="font-semibold">ตัวอย่างผลลัพธ์</p>
+                                <ul class="mt-3 text-sm space-y-2 bg-emerald-50 p-5 rounded-2xl">
+                                    <li class="flex items-start gap-3">• Script รีวิวหนังสือ 3 นาที (พร้อม hook + conclusion)</li>
+                                    <li class="flex items-start gap-3">• ตารางเปรียบเทียบประเทศ (พร้อมคะแนนส่วนตัว)</li>
+                                    <li class="flex items-start gap-3">• คำแนะนำ “ข้ามเล่มนี้ได้” + เหตุผล</li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3 Content -->
+        <div id="content-2" class="tab-content hidden">
+            <div class="bg-white rounded-3xl shadow-xl p-10">
+                <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                    <span class="bg-emerald-100 text-emerald-600 w-9 h-9 flex items-center justify-center rounded-2xl text-xl">3</span>
+                    Obsidian = สมองที่สองถาวร (Second Brain)
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <div class="bg-emerald-50 border border-emerald-200 p-8 rounded-3xl">
+                            <h4 class="font-semibold text-emerald-700 mb-6">วิธีโยนข้อมูลเข้า Obsidian</h4>
+                            <div class="space-y-6">
+                                <div class="flex gap-4">
+                                    <i class="fa-solid fa-file-export text-3xl text-emerald-500 mt-1"></i>
+                                    <div>
+                                        <p class="font-medium">1. Export จาก NotebookLM หรือ Gemini</p>
+                                        <p class="text-xs text-slate-500">Copy Markdown → วางใน note ใหม่</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <i class="fa-solid fa-link text-3xl text-emerald-500 mt-1"></i>
+                                    <div>
+                                        <p class="font-medium">2. ใช้ [[Link]] เชื่อมกับ note เก่า</p>
+                                        <p class="text-xs text-slate-500">เช่น [[ความรู้การเงินของฉัน]]</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <i class="fa-solid fa-map text-3xl text-emerald-500 mt-1"></i>
+                                    <div>
+                                        <p class="font-medium">3. สร้าง MOC (Map of Content)</p>
+                                        <p class="text-xs text-slate-500">หน้าเดียวสรุปทุกอย่างที่เชื่อมโยง</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-slate-600">
+                        <p class="font-medium mb-4">ทำไม Obsidian สำคัญสุด?</p>
+                        <ul class="space-y-4">
+                            <li class="flex gap-3"><span class="text-2xl">🔗</span> ความรู้ใหม่เชื่อมกับความรู้เก่า → ไม่ลืม</li>
+                            <li class="flex gap-3"><span class="text-2xl">📈</span> กลายเป็นเครือข่ายความรู้ส่วนตัว</li>
+                            <li class="flex gap-3"><span class="text-2xl">⏳</span> ครั้งหน้าจะเรียกใช้ได้ทันที</li>
+                        </ul>
+                        <div class="mt-10 text-center text-xs bg-white border rounded-2xl p-6">
+                            <p class="font-medium">ตัวอย่างคำสั่งใน Obsidian</p>
+                            <code class="block mt-3 text-left bg-slate-100 p-4 rounded-xl">[[Relocation 2026]] → [[Bulgaria Pros]]</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Section: Personalize + Download -->
+        <div id="start" class="mt-16 bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-3xl p-12 text-center">
+            <h2 class="text-3xl font-bold mb-6">พร้อมเริ่มเลยไหม? ลองสร้าง Prompt ส่วนตัว</h2>
+            
+            <div class="max-w-xl mx-auto">
+                <input id="topic-input" 
+                       type="text" 
+                       placeholder="หัวข้อที่อยากเรียนวันนี้ เช่น ย้ายไปญี่ปุ่น / Prompt Engineering / Linux Server"
+                       class="w-full px-8 py-6 rounded-3xl text-slate-900 text-lg focus:outline-none">
+                
+                <button onclick="generateCustomPrompt()" 
+                        class="mt-6 bg-white text-blue-600 hover:bg-amber-300 font-bold text-xl px-12 py-5 rounded-3xl shadow-xl transition-all">
+                    สร้าง Prompt ให้ฉันเลย!
+                </button>
+            </div>
+            
+            <div id="custom-output" class="hidden mt-10 bg-white/10 backdrop-blur-xl rounded-3xl p-8 text-left text-sm font-mono max-w-2xl mx-auto"></div>
+        </div>
+
+        <div class="text-center mt-16 text-xs text-slate-400">
+            คัดลอก HTML นี้ไปบันทึกเป็นไฟล์ .html แล้วเปิดได้เลย • ใช้งานได้ออฟไลน์ 100% • อัพเดทจากวิดีโอต้นฉบับ 22 มี.ค. 2026
+        </div>
+    </div>
+
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            // Already loaded via CDN
+        }
+
+        // Tab switching
+        let currentTab = 0;
+        function switchTab(tabIndex) {
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('tab-active', i === tabIndex);
+            });
+            document.querySelectorAll('.tab-content').forEach((c, i) => {
+                c.classList.toggle('hidden', i !== tabIndex);
+            });
+            currentTab = tabIndex;
+        }
+
+        // Copy prompt
+        function copyPrompt(btn) {
+            const pre = btn.parentElement.parentElement.querySelector('pre') || 
+                        btn.parentElement.parentElement.querySelector('div.font-mono');
+            if (!pre) return;
+            
+            const text = pre.innerText || pre.textContent;
+            navigator.clipboard.writeText(text.trim()).then(() => {
+                const original = btn.innerHTML;
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> คัดลอกแล้ว!`;
+                btn.style.backgroundColor = '#10b981';
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.style.backgroundColor = '';
+                }, 2000);
+            });
+        }
+
+        // Progress
+        function updateProgress() {
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            const progress = Math.min(Math.round((checked / 2) * 33) + (currentTab * 33), 99);
+            
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = `${Math.floor(progress/33)}/3 ขั้นตอน`;
+        }
+
+        // Generate custom prompt
+        function generateCustomPrompt() {
+            const topic = document.getElementById('topic-input').value.trim();
+            if (!topic) {
+                alert('กรุณาพิมพ์หัวข้อที่อยากเรียนก่อนครับ 😉');
+                return;
+            }
+            
+            const output = document.getElementById('custom-output');
+            output.classList.remove('hidden');
+            output.innerHTML = `
+                <div class="font-medium text-emerald-400 mb-4">✅ Prompt ที่สร้างให้คุณแล้ว (คัดลอกไปใช้ได้เลย)</div>
+                <pre class="bg-black/70 text-emerald-300 p-8 rounded-3xl overflow-auto text-base leading-relaxed">ฉันกำลังศึกษาหัวข้อ "${topic}"<br>
+ฉันมีพื้นฐานระดับ [ใส่ระดับตัวเอง เช่น มือใหม่ / กลาง ๆ]<br><br>
+ช่วยทำตาม workflow นี้ให้ฉัน:<br>
+1. NotebookLM: โยนแหล่งข้อมูล 10-20 ชิ้น → สรุปเฉพาะส่วนใหม่ + Mind Map + Audio<br>
+2. Gemini: เอา output มาวิเคราะห์ → ตัดส่วนซ้ำ + เขียน bullet ชัด + script ถ้าต้องการ<br>
+3. Obsidian: เก็บเป็น note แล้วเชื่อม [[ความรู้เก่า]]<br><br>
+ตอบกลับด้วย Markdown ที่พร้อม copy ไปใช้ทันที</pre>
+                <button onclick="copyPrompt(this)" class="mt-6 bg-white text-blue-600 px-8 py-4 rounded-3xl text-sm font-semibold flex items-center gap-2 mx-auto">
+                    <i class="fa-solid fa-copy"></i> คัดลอก Prompt นี้
+                </button>
+            `;
+        }
+
+        // Keyboard shortcut
+        document.addEventListener('keydown', function(e) {
+            if (e.metaKey && e.key === 'k') {
+                e.preventDefault();
+                const input = document.getElementById('topic-input');
+                input.focus();
+            }
+        });
+
+        // Init
+        window.onload = function() {
+            // Set first tab active
+            switchTab(0);
+            
+            // Fake initial progress
+            setTimeout(() => {
+                document.getElementById('progress-bar').style.width = '33%';
+            }, 800);
+            
+            console.log('%c✅ HTML Interactive พร้อมใช้งานแล้ว! (Built for 9Donmai)', 'color:#3b82f6; font-family:monospace');
+        };
+    </script>
+</body>
+</html>
